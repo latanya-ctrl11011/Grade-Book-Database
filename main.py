@@ -241,7 +241,7 @@ stu_in_bio = computations.students_in_bio(3)
 print("Students in Bio 101 are ", stu_in_bio)
 
 stu_in_cs = computations.students_in_course(1)
-print("The grades for students in CS 100 are ", stu_in_cs)
+print("The grades on each assignment for all students in CS 100 are ", stu_in_cs)
 
 computations.add_assignment(21,2,1)
 # Commit the transaction
