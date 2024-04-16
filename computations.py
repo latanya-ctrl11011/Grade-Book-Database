@@ -1,7 +1,7 @@
 import numpy as np
-import tables
+#import tables
 import sqlite3
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 
 conn = sqlite3.connect('tables.db')
