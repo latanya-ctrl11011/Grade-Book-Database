@@ -9,3 +9,6 @@ INSTRUCTIONS ON COMPILING AND EXECUTING THE CODE.
 2. Create four separate files: main.py, computations.py, tables_data.txt, and tables.db
 3. Paste the code into their respective files.
 4. Return to your "main.py" file and the green button in the top left side of the screen labeled "Run"
+
+Option 2:
+Clone Repository in your favorite IDE and run code.
