@@ -1,1 +1,73 @@
+# Create tables
+c.execute("""DROP TABLE IF EXISTS Course""")
+c.execute('''
+    CREATE TABLE Course (
+        course_id INTEGER PRIMARY KEY,
+        department TEXT,
+        course_number INTEGER,
+        course_name TEXT,
+        semester TEXT,
+        year INTEGER
+    )
+''')
+
+c.execute("""DROP TABLE IF EXISTS Student""")
+c.execute('''
+    CREATE TABLE Student (
+        student_id INTEGER PRIMARY KEY,
+        f_name TEXT,
+        l_name TEXT
+    )
+''')
+c.execute("""DROP TABLE IF EXISTS Category""")
+c.execute('''
+    CREATE TABLE Category (
+        category_id INTEGER PRIMARY KEY,
+        category_name TEXT,
+        weight INTEGER
+    )
+''')
+
+c.execute("""DROP TABLE IF EXISTS Assignment""")
+c.execute('''
+    CREATE TABLE Assignment (
+        assignment_id INTEGER PRIMARY KEY,
+        category_id INTEGER,
+        course_id INTEGER,
+        FOREIGN KEY (course_id) REFERENCES Course(course_id),
+        FOREIGN KEY (category_id) REFERENCES Category(category_id)
+    )
+''')
+c.execute('''
+    CREATE TRIGGER enforce_category_id_constraint
+        BEFORE INSERT ON Assignment
+            FOR EACH ROW
+                 WHEN NEW.category_id >= 5
+                    BEGIN
+                        SELECT RAISE(ABORT, 'category_id must be less than 5');
+                    END;
+''')
+
+c.execute("""DROP TABLE IF EXISTS Grades""")
+c.execute('''
+    CREATE TABLE Grades (
+        course_id INTEGER,
+        student_id INTEGER,
+        assignment_id INTEGER,
+        score DECIMAL(5, 2),
+        FOREIGN KEY (course_id) REFERENCES Student(course_id),
+        FOREIGN KEY (student_id) REFERENCES Student(student_id),
+        FOREIGN KEY (assignment_id) REFERENCES Assignment(assignment_id)
+    )
+''')
+
+c.execute("""DROP TABLE IF EXISTS Roster""")
+c.execute('''
+    CREATE TABLE Roster (
+        course_id INTEGER,
+        student_id INTEGER,
+        FOREIGN KEY (course_id) REFERENCES Student(course_id),
+        FOREIGN KEY (student_id) REFERENCES Student(student_id)
+    )
+''')
 
