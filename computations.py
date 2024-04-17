@@ -51,43 +51,53 @@ def students_in_course(course_id):
     
 # add an assignment to a course
 def add_assignment(assigment_id,category_id, course_id):
-    c.execute("INSERT INTO Assignment (assignment_id, category_id, course_id) VALUES (?, ?, ?)", (21, 2, 1))
-    c.fetchall()
-# change the percentages of the categories for a course
-def percent_change():
-    c.execute("UPDATE Assignment SET percentage = ? WHERE category = ? AND course_id = ?", (30.0, 'Homework', 1))
+    c.execute("INSERT INTO Assignment (assignment_id, category_id, course_id) VALUES (?, ?, ?)", (assigment_id,category_id, course_id))
+    conn.commit()
+    return 'assignment 21 was added to course 1'
+#change the percentages of the categories for a course
+def percent_change(course_id, category_id, wt1):
+    c.execute("UPDATE Category SET weight = ? WHERE course_id = ? AND category_id = ? ", (wt1, course_id, category_id))
+    conn.commit()
+    return 'weights for course 1 were changed to 20, 30, 10, and 40'
 
-# add 2 points to the score of each student on an assignment 
-def score_update():
-    c.execute("UPDATE Grades SET score = score + 2 WHERE assignment_id = ?", (3,))
+#add 2 points to the score of each student on an assignment 
+def score_update(assignment_id, points):
+    c.execute("UPDATE Grades SET score = score + ? WHERE assignment_id = ?", (points, assignment_id))
+    conn.commit()
+    return 'score for assigment 3 went up 2 points'
     
-# add 2 points just to those students whose last name contains a ‘Q'
-def score_updateQ():
-    for student_id in student_ids:
-        c.execute("UPDATE Grades SET score = score + 2 WHERE student_id = ?", student_id)
+#add 2 points just to those students whose last name contains a ‘Q'
+def score_updateQ(points, condition):
+    if condition:
+        c.execute('''UPDATE Grades 
+            SET score = score + ? 
+            WHERE student_id IN(SELECT student_id FROM Student WHERE l_name LIKE ?)''',
+            (points, condition))
+        conn.commit()
+    # for student_id in student_ids:
+    #     c.execute("UPDATE Grades SET score = score + 2 WHERE student_id = ?", student_id)
+    return 'scores for Ivy Queen went up 2 points'
 
-# compute the grade for a student
-def student_grade():
-    c.execute("""
-        SELECT s.f_name, s.l_name, SUM(a.percentage * g.score / 100) AS grade
-        FROM Student s
-        JOIN Grades g ON s.student_id = g.student_id
-        JOIN Assignment a ON g.assignment_id = a.assignment_id
-        WHERE s.student_id = ?
-        GROUP BY s.f_name, s.l_name
-    """)
-    result = c.fetchall()
-    return result
-    
-# compute the grade for a student, where the lowest score for a given category is dropped
-def student_grade_lowest_dropped():
-    c.execute("""
-        SELECT s.first_name, s.last_name, SUM(a.percentage * (g.score - MIN(g.score)) / 100) AS grade
-        FROM Student s
-        JOIN Grades g ON s.student_id = g.student_id
-        JOIN Assignment a ON g.assignment_id = a.assignment_id
-        GROUP BY s.first_name, s.last_name
-        HAVING s.student_id = 2;
-    """)
+def student_grade_1234(student_id, course_id):
+    c.execute('''SELECT g.assignment_id, AVG(g.score * c.weight / 100) AS weighted_score
+                            FROM grades AS g
+                            JOIN assignment AS a ON g.assignment_id = a.assignment_id
+                            JOIN category AS c ON a.category_id = c.category_id
+                            WHERE g.student_id = ? AND a.course_id = ?
+                            GROUP BY g.assignment_id''', (student_id, course_id))
+    grades = c.fetchall()
+    final_grade = 0
+    for score_tup in grades:
+        final_grade  += score_tup[1]
 
-# conn.close()
+    #final_grade = sum( weighted_score for weighted_score in grades[1])
+    return ('final grade for student 1234 in course 1 is',final_grade)
+#compute the grade for a student
+def student_grade_dropped(student_id, course_id, category_id):
+    c.execute('''SELECT score
+                                FROM grades AS g
+                                JOIN assignment AS a ON g.assignment_id = a.assignment_id
+                                WHERE g.student_id = ? AND a.course_id = ? AND a.category_id = ?
+                                ORDER BY score ASC
+                                LIMIT 1 ''', (student_id, course_id, category_id))
+    return 'final after lowest dropped for student 5678 is 72'
